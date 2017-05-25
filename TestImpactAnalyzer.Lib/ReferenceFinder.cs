@@ -42,18 +42,9 @@ namespace TestImpactAnalyzer.Lib
 
             var model = document.GetSemanticModelAsync().Result;
             var syntaxRoot = document.GetSyntaxRootAsync().Result;
-            ClassDeclarationSyntax node = null;
-            try
-            {
-                node = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>()
-                    .Where(x => x.Identifier.Text == className)
-                    .FirstOrDefault();
-            }
-            catch(Exception)
-            {
-                // Swallow the exception of type cast. 
-                // Could be avoided by a better filtering on above linq.
-            }
+            ClassDeclarationSyntax node = syntaxRoot.DescendantNodes()
+                    .OfType<ClassDeclarationSyntax>()
+                    .FirstOrDefault(x => x.Identifier.Text == className);
             var classSymbol = model.GetDeclaredSymbol(node);
             var referencedSymbols = SymbolFinder.FindReferencesAsync(classSymbol, solution).Result;
 
