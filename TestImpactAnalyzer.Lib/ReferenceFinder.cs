@@ -140,7 +140,7 @@ namespace TestImpactAnalyzer.Lib
             var classNode = GetClassNode(referenceLocation);
             var childNodes = classNode.ChildNodes();
             var attributesNode = childNodes.OfType<AttributeListSyntax>().FirstOrDefault();
-            return attributesNode != null && attributesNode.Attributes.Any(a => a.ToString() == "TestClass");
+            return attributesNode != null && attributesNode.Attributes.Any(a => a.ToString() == "TestClass" || a.ToString() == "Test");
         }
 
         private static ISymbol GetClassSymbol(ReferenceLocation location)

@@ -47,7 +47,7 @@ namespace TestImpactAnalyzer.UnitTests
         }
 
         [TestMethod]
-        public void FindAffectedTests_ForTheClassFromTheSameProject_ReturnsSingleLocation()
+        public void FindAffectedMsTests_ForTheClassFromTheSameProject_ReturnsSingleLocation()
         {
             var workspace = CreateWorkspace("[TestClass]");
 
@@ -57,7 +57,19 @@ namespace TestImpactAnalyzer.UnitTests
 
             Assert.AreEqual(1, references.Count());            
         }
-        
+ 
+        [TestMethod]
+        public void FindAffectedNUnitTests_ForTheClassFromTheSameProject_ReturnsSingleLocation()
+        {
+            var workspace = CreateWorkspace("[Test]");
+
+            var finder = new ReferenceFinder(workspace);
+
+            var references = finder.FindAffectedTests("Class1.cs", "Class1");
+
+            Assert.AreEqual(1, references.Count());            
+        }
+               
         private static AdhocWorkspace CreateWorkspace(string testAttribute = "")
         {
             var workspace = new AdhocWorkspace();
