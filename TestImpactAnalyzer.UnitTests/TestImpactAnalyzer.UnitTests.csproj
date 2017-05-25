@@ -209,11 +209,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="Samples\UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnitTest2.cs" />
+    <Compile Include="Samples\UnitTest2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TestImpactAnalyzer.Lib.Samples\TestImpactAnalyzer.Lib.Samples.csproj">
+      <Project>{8461b978-e6d5-4e23-8f2c-1beb3f1af096}</Project>
+      <Name>TestImpactAnalyzer.Lib.Samples</Name>
+    </ProjectReference>
     <ProjectReference Include="..\TestImpactAnalyzer.Lib\TestImpactAnalyzer.Lib.csproj">
       <Project>{AC3ED809-8691-4B03-BB04-DBB8D98E8087}</Project>
       <Name>TestImpactAnalyzer.Lib</Name>

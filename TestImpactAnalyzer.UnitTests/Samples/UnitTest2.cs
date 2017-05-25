@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TestImpactAnalyzer.Lib;
+using TestImpactAnalyzer.Lib.Samples;
 
-namespace TestImpactAnalyzer.UnitTests
+namespace TestImpactAnalyzer.UnitTests.Samples
 {
     [TestClass]
     public class UnitTest2

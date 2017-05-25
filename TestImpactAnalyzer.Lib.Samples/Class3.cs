@@ -1,4 +1,4 @@
-﻿namespace TestImpactAnalyzer.Lib
+﻿namespace TestImpactAnalyzer.Lib.Samples
 {
     public class Class3
     {

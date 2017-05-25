@@ -1,4 +1,6 @@
-﻿namespace TestImpactAnalyzer.Console
+﻿using TestImpactAnalyzer.Lib;
+
+namespace TestImpactAnalyzer.Console
 {
     class Program
     {

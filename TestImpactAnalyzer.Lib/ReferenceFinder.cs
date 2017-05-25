@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.FindSymbols;
 using Microsoft.CodeAnalysis.MSBuild;
-using Microsoft.CodeAnalysis.CSharp;
 
-namespace TestImpactAnalyzer.Console
+namespace TestImpactAnalyzer.Lib
 {
-    class ReferenceFinder
+    public class ReferenceFinder
     {
         public void Find(string solutionPath, string methodName)
         {
             var msWorkspace = MSBuildWorkspace.Create();
 
-            System.Console.WriteLine("Searching for class \"{0}\" reference in solution {1} ", "Class1", Path.GetFileName(solutionPath));
+            Console.WriteLine("Searching for class \"{0}\" reference in solution {1} ", "Class1", Path.GetFileName(solutionPath));
             ISymbol classSymbol = null;
             bool found = false;
 
@@ -96,24 +96,24 @@ namespace TestImpactAnalyzer.Console
                 }
             }
 
-            System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine("Found references in files.");
-            System.Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Found references in files.");
+            Console.ResetColor();
             foreach (var location in visited.Values)
             {
-                System.Console.WriteLine("File: " + location.Document.Name);
+                Console.WriteLine("File: " + location.Document.Name);
             }
 
             var unitTests = GetUnitTestLocations(visited.Values);
-            System.Console.ForegroundColor = ConsoleColor.Green;
-            System.Console.WriteLine("Found references in unit tests.");
-            System.Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Found references in unit tests.");
+            Console.ResetColor();
             foreach (var location in unitTests)
             {
-                System.Console.WriteLine("File: " + location.Document.Name);
+                Console.WriteLine("File: " + location.Document.Name);
             }
 
-            System.Console.WriteLine("Finished searching. Press any key to continue....");
+            Console.WriteLine("Finished searching. Press any key to continue....");
         }
 
         private static IEnumerable<ReferenceLocation> GetUnitTestLocations(IEnumerable<ReferenceLocation> locations)
