@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -12,48 +11,50 @@ namespace TestImpactAnalyzer.Lib
 {
     public class ReferenceFinder
     {
-        public void Find(string solutionPath, string methodName)
+        private readonly string _solutionPath;
+
+        public ReferenceFinder(string solutionPath)
         {
-            var msWorkspace = MSBuildWorkspace.Create();
+            _solutionPath = solutionPath;
+            Workspace = MSBuildWorkspace.Create();
+        }
 
-            Console.WriteLine("Searching for class \"{0}\" reference in solution {1} ", "Class1", Path.GetFileName(solutionPath));
-            ISymbol classSymbol = null;
-            bool found = false;
+        public ReferenceFinder(Workspace workspace)
+        {
+            Workspace = workspace;
+        }
 
-            var solution = msWorkspace.OpenSolutionAsync(solutionPath).Result;
-            foreach (var project in solution.Projects)
+        public Workspace Workspace { get; private set; }
+
+        public IEnumerable<ReferenceLocation> FindClassUsages(string filePath, string className)
+        {
+            var solution = Workspace.CurrentSolution;
+            if (!string.IsNullOrEmpty(_solutionPath))
             {
-                foreach (var document in project.Documents)
-                {
-                    var model = document.GetSemanticModelAsync().Result;
+                solution = ((MSBuildWorkspace)Workspace).OpenSolutionAsync(_solutionPath).Result;
+            }
+            var document = FindDocument(solution, filePath);
 
-                    var syntaxRoot = document.GetSyntaxRootAsync().Result;
-                    InvocationExpressionSyntax node;
-                    try
-                    {
-                        node = syntaxRoot.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                            .Where(x => ((MemberAccessExpressionSyntax)x.Expression).Name.ToString() == methodName)
-                            .FirstOrDefault();
-
-                        if (node == null)
-                            continue;
-                    }
-                    catch(Exception)
-                    {
-                        // Swallow the exception of type cast. 
-                        // Could be avoided by a better filtering on above linq.
-                        continue;
-                    }
-
-                    var methodSymbol = model.GetSymbolInfo(node).Symbol;
-                    classSymbol = methodSymbol.ContainingSymbol;
-                    found = true;
-                    break;
-                }
-
-                if (found) break;
+            if (document == null)
+            {
+                throw new InvalidOperationException();
             }
 
+            var model = document.GetSemanticModelAsync().Result;
+            var syntaxRoot = document.GetSyntaxRootAsync().Result;
+            ClassDeclarationSyntax node = null;
+            try
+            {
+                node = syntaxRoot.DescendantNodes().OfType<ClassDeclarationSyntax>()
+                    .Where(x => x.Identifier.Text == className)
+                    .FirstOrDefault();
+            }
+            catch(Exception)
+            {
+                // Swallow the exception of type cast. 
+                // Could be avoided by a better filtering on above linq.
+            }
+            var classSymbol = model.GetDeclaredSymbol(node);
             var referencedSymbols = SymbolFinder.FindReferencesAsync(classSymbol, solution).Result;
 
             var queue = new Queue<ReferencedSymbol>();
@@ -95,28 +96,17 @@ namespace TestImpactAnalyzer.Lib
                     }
                 }
             }
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Found references in files.");
-            Console.ResetColor();
-            foreach (var location in visited.Values)
-            {
-                Console.WriteLine("File: " + location.Document.Name);
-            }
-
-            var unitTests = GetUnitTestLocations(visited.Values);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Found references in unit tests.");
-            Console.ResetColor();
-            foreach (var location in unitTests)
-            {
-                Console.WriteLine("File: " + location.Document.Name);
-            }
-
-            Console.WriteLine("Finished searching. Press any key to continue....");
+            return visited.Values;
         }
 
-        private static IEnumerable<ReferenceLocation> GetUnitTestLocations(IEnumerable<ReferenceLocation> locations)
+        public IEnumerable<ReferenceLocation> FindAffectedTests(string classPath, string className)
+        {
+            var classReferences = FindClassUsages(classPath, className);
+            var unitTests = GetUnitTestLocations(classReferences);
+            return unitTests;
+        }
+
+        public static IEnumerable<ReferenceLocation> GetUnitTestLocations(IEnumerable<ReferenceLocation> locations)
         {
             var unitTests = new List<ReferenceLocation>();
             foreach (var fileLocation in locations)
@@ -128,6 +118,22 @@ namespace TestImpactAnalyzer.Lib
             }
             return unitTests;
         }
+        
+        private static Document FindDocument(Solution solution, string filePath)
+        {
+            Document document = null;
+            foreach (var solutionProject in solution.Projects)
+            {
+                foreach (var projectDocument in solutionProject.Documents)
+                {
+                    if (projectDocument.FilePath == filePath)
+                    {
+                        document = projectDocument;
+                    }
+                }
+            }
+            return document;
+        }
 
         private static bool IsUnitTestsFile(ReferenceLocation referenceLocation)
         {
@@ -137,27 +143,21 @@ namespace TestImpactAnalyzer.Lib
             return attributesNode != null && attributesNode.Attributes.Any(a => a.ToString() == "TestClass");
         }
 
-        private static SyntaxNode GetClassNode(ReferenceLocation referenceLocation)
-        {
-            var methodNode = GetMethodNode(referenceLocation);
-            return methodNode.Parent;
-        }
-
         private static ISymbol GetClassSymbol(ReferenceLocation location)
         {
-            SyntaxNode referencedClassNode = GetMethodNode(location);
+            SyntaxNode referencedClassNode = GetClassNode(location);
             var semanticModel = location.Document.GetSemanticModelAsync().Result;
             var referencedClassSymbol = semanticModel.GetDeclaredSymbol(referencedClassNode);
-            return referencedClassSymbol.ContainingSymbol;
+            return referencedClassSymbol;
         }
 
-        private static SyntaxNode GetMethodNode(ReferenceLocation location)
+        private static SyntaxNode GetClassNode(ReferenceLocation location)
         {
             var referenceLocation = location.Location;
             var lineSpan = referenceLocation.SourceSpan;
             var root = location.Document.GetSyntaxRootAsync().Result;
             var locationNode = root.DescendantNodes(lineSpan).First(n => lineSpan.Contains(n.Span));
-            SyntaxNode referencedClassNode = FindParentFor(locationNode, SyntaxKind.MethodDeclaration);
+            SyntaxNode referencedClassNode = FindParentFor(locationNode, SyntaxKind.ClassDeclaration);
             return referencedClassNode;
         }
 

@@ -14,3 +14,5 @@
 /.vs/TestImpactAnalyzer/v14
 /TestImpactAnalyzer.Lib.Samples/bin/Debug
 /TestImpactAnalyzer.Lib.Samples/obj/Debug
+/TestResults
+*.user
