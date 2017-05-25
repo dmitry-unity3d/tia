@@ -436,6 +436,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MercurialClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReferenceFinder.cs" />
   </ItemGroup>
