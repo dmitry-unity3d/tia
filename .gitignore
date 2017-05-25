@@ -3,3 +3,12 @@
 ################################################################################
 
 /packages
+/RunAffectedTestsCommand/bin/Debug
+/RunAffectedTestsCommand/obj/Debug
+/TestImpactAnalyzer.Console/bin/Debug
+/TestImpactAnalyzer.Console/obj/Debug
+/TestImpactAnalyzer.Lib/bin/Debug
+/TestImpactAnalyzer.Lib/obj/Debug
+/TestImpactAnalyzer.UnitTests/bin/Debug
+/TestImpactAnalyzer.UnitTests/obj/Debug
+/.vs/TestImpactAnalyzer/v14
