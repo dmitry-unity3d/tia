@@ -5,11 +5,13 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.Globalization;
+using System.IO;
+using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using TestImpactAnalyzer.Lib;
 
 namespace RunAffectedTestsCommand
 {
@@ -51,16 +53,23 @@ namespace RunAffectedTestsCommand
             if (commandService != null)
             {
                 var menuCommandID = new CommandID(CommandSet, CommandId);
-                var menuItem = new MenuCommand(StartNotepad, menuCommandID);
+                var menuItem = new MenuCommand(FindAndRunAffectedTests, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
         }
 
-        private void StartNotepad(object sender, EventArgs e)  
+        private static void FindAndRunAffectedTests(object sender, EventArgs e)  
         {  
-            Process proc = new Process();  
-            proc.StartInfo.FileName = "notepad.exe";  
-            proc.Start();  
+            var workingFolder = "C:\\Projects\\unity3d\\unity";
+
+            var runTestCommandProcess = new Process {
+                StartInfo = new ProcessStartInfo {
+                    FileName = "C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.Console\\bin\\Debug\\TestImpactAnalyzer.Console.exe",
+                    Arguments = workingFolder,
+                    UseShellExecute = false
+                }
+            };
+            runTestCommandProcess.Start();
         }  
 
         /// <summary>
@@ -90,28 +99,6 @@ namespace RunAffectedTestsCommand
         public static void Initialize(Package package)
         {
             Instance = new RunAffectedTestsCommand(package);
-        }
-
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "RunAffectedTestsCommand";
-
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
     }
 }
