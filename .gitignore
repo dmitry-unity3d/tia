@@ -16,3 +16,5 @@
 /TestImpactAnalyzer.Lib.Samples/obj/Debug
 /TestResults
 *.user
+/TestImpactAnalyzer.Web/bin
+/TestImpactAnalyzer.Web/obj/Debug

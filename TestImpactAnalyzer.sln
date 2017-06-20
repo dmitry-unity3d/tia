@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunAffectedTestsCommand", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestImpactAnalyzer.Lib.Samples", "TestImpactAnalyzer.Lib.Samples\TestImpactAnalyzer.Lib.Samples.csproj", "{8461B978-E6D5-4E23-8F2C-1BEB3F1AF096}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestImpactAnalyzer.Web", "TestImpactAnalyzer.Web\TestImpactAnalyzer.Web.csproj", "{C03B6A6C-D5A6-4834-912F-10E46228DD3B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,10 @@ Global
 		{8461B978-E6D5-4E23-8F2C-1BEB3F1AF096}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8461B978-E6D5-4E23-8F2C-1BEB3F1AF096}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8461B978-E6D5-4E23-8F2C-1BEB3F1AF096}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C03B6A6C-D5A6-4834-912F-10E46228DD3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C03B6A6C-D5A6-4834-912F-10E46228DD3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C03B6A6C-D5A6-4834-912F-10E46228DD3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C03B6A6C-D5A6-4834-912F-10E46228DD3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
