@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -16,11 +15,21 @@ namespace TestImpactAnalyzer.Lib
 
         public string[] GetChangedFiles()
         {
+            return ExecuteHgStatusCommand("status");
+        }
+
+        public string[] GetChangedFiles(string revision)
+        {
+            return ExecuteHgStatusCommand($"status --change {revision}");
+        }
+
+        private string[] ExecuteHgStatusCommand(string argument)
+        {
             var changedFiles = new List<string>();
             var statusCommandProcess = new Process {
                 StartInfo = new ProcessStartInfo {
                     FileName = "hg",
-                    Arguments = "status",
+                    Arguments = argument,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true,
@@ -38,7 +47,7 @@ namespace TestImpactAnalyzer.Lib
                 }
                 changedFiles.Add(changedFileFullPath);
             }
-            return changedFiles.ToArray();
+            return changedFiles.ToArray();            
         }
     }
 }
