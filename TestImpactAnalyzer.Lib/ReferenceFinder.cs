@@ -24,7 +24,7 @@ namespace TestImpactAnalyzer.Lib
             Workspace = workspace;
         }
 
-        public Workspace Workspace { get; private set; }
+        public Workspace Workspace { get; }
 
         public IEnumerable<ReferenceLocation> FindClassUsages(string filePath, string className)
         {
