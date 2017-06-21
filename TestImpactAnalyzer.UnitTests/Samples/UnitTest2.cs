@@ -11,7 +11,7 @@ namespace TestImpactAnalyzer.UnitTests.Samples
         {
             var c = new Class3();
 
-            Assert.AreEqual(15, c.GetInt3());
+            Assert.AreEqual(19, c.GetInt3());
         }
     }
 }

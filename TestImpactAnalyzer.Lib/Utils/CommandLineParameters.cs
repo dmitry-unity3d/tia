@@ -1,5 +1,5 @@
 ﻿using System;
-using JetBrains.Util;
+using System.Linq;
 
 namespace TestImpactAnalyzer.Lib.Utils
 {
