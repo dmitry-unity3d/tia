@@ -198,6 +198,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CommandLineParametersTests.cs" />
     <Compile Include="ReferenceFinderTests.cs" />
     <Compile Include="Samples\UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
