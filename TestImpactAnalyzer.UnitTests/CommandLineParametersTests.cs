@@ -24,6 +24,22 @@ namespace TestImpactAnalyzer.UnitTests
         }
 
         [TestMethod]
+        public void Parse_WaitOnFinishParameterExists_WaitOnFinishIsTrue()
+        {
+            var actualParameters = CommandLineParameters.Parse(new[] { "--wait" });
+
+            Assert.IsTrue(actualParameters.WaitOnFinish);
+        }
+
+        [TestMethod]
+        public void Parse_WaitOnFinishParameterNotExists_WaitOnFinishIsFalse()
+        {
+            var actualParameters = CommandLineParameters.Parse(new[] { "--solution-path", "c:\\aaa\\a.sln", "--revision", "aa23d54f" });
+
+            Assert.IsFalse(actualParameters.WaitOnFinish);
+        }
+
+        [TestMethod]
         public void Parse_SolutionPathParameterNotExists_SolutionPathIsEmpty()
         {
             var actualParameters = CommandLineParameters.Parse(new[] { "--run-tests", "--revision", "aa23d54f" });

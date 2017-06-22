@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
 using TestImpactAnalyzer.Lib;
 using TestImpactAnalyzer.Lib.Utils;
 
@@ -19,47 +21,49 @@ namespace TestImpactAnalyzer.Console
             }
             var workingFolder = commandLineParamters.WorkingFolder;
             var solutionPath = commandLineParamters.SolutionPath;
-            var writeOutput = commandLineParamters.OutputFormatting == FormattingType.Text;
+            var textOutput = commandLineParamters.OutputFormatting == FormattingType.Text;
 
-            Trace.WriteLineIf(writeOutput, "Getting changed file(s)...");
+            Trace.WriteLineIf(textOutput, "Getting changed file(s)...");
             var mercurialClient = new MercurialClient(workingFolder);
             var changes = mercurialClient.GetChangedFiles();
             foreach (var changedFile in changes)
             {
-                Trace.WriteLineIf(writeOutput, changedFile);
+                Trace.WriteLineIf(textOutput, changedFile);
             }
-            Trace.WriteLineIf(writeOutput, "");
+            Trace.WriteLineIf(textOutput, "");
 
             var classPath = changes[0];
             var className = Path.GetFileNameWithoutExtension(classPath);
 
-            Trace.WriteLineIf(writeOutput, "Searching for references in solution...");
+            Trace.WriteLineIf(textOutput, "Searching for references in solution...");
             var finder = new ReferenceFinder(solutionPath);
             var locations = finder.FindClassUsages(classPath, className);
-            Trace.WriteLineIf(writeOutput, "Affected file(s):");
+            Trace.WriteLineIf(textOutput, "Affected file(s):");
             foreach (var location in locations)
             {
-                Trace.WriteLineIf(writeOutput, location.Document.Name);
+                Trace.WriteLineIf(textOutput, location.Document.Name);
             }
-            Trace.WriteLineIf(writeOutput, "");
+            Trace.WriteLineIf(textOutput, "");
 
             if (!commandLineParamters.RunTests)
             {
                 return;
             }
-            Trace.WriteLineIf(writeOutput, "Affected unit test(s):");
+            Trace.WriteLineIf(textOutput, "Affected unit test(s):");
             var unitTests = ReferenceFinder.GetUnitTestLocations(locations);
+            var unitTestFiles = new List<string>(unitTests.Select(ul => ul.Document.FilePath));
+            Trace.WriteLineIf(!textOutput, JsonConvert.SerializeObject(unitTestFiles.ToArray()));
             var testsAssemlblies = new List<string>();
             var testsNames = new List<string>();
             foreach (var location in unitTests)
             {
-                System.Console.WriteLine(location.Document.Name);
+                Trace.WriteLineIf(textOutput, location.Document.Name);
                 testsAssemlblies.Add(location.Document.Project.OutputFilePath);
                 testsNames.Add($"test =~ /{Path.GetFileNameWithoutExtension(location.Document.Name)}/");
             }
-            Trace.WriteLineIf(writeOutput, "");
+            Trace.WriteLineIf(textOutput, "");
 
-            Trace.WriteLineIf(writeOutput, "Running affected unit test(s)...");
+            Trace.WriteLineIf(textOutput, "Running affected unit test(s)...");
             var testAssembliesCombined = string.Join(" ", testsAssemlblies);
             var testsExpression = string.Join(" || ", testsNames);
 
@@ -75,9 +79,13 @@ namespace TestImpactAnalyzer.Console
             runTestCommandProcess.Start();
             while (!runTestCommandProcess.StandardOutput.EndOfStream) {
                 var line = runTestCommandProcess.StandardOutput.ReadLine();
-                Trace.WriteLineIf(writeOutput, line);
+                Trace.WriteLineIf(textOutput, line);
             }
-            System.Console.ReadLine();
+
+            if (commandLineParamters.WaitOnFinish)
+            {
+                System.Console.ReadLine();   
+            }
         }
     }
 }

@@ -17,6 +17,7 @@ namespace TestImpactAnalyzer.Lib.Utils
         private const string RevisionParameter = "revision";
         private const string WorkingFolderParameter = "working-folder";
         private const string OutputFormattingParameter = "formatting";
+        private const string WaitOnFinishParameter = "wait";
 
         public string Revision { get; private set; }
 
@@ -28,10 +29,13 @@ namespace TestImpactAnalyzer.Lib.Utils
 
         public FormattingType OutputFormatting { get; private set; } = FormattingType.Json;
 
+        public bool WaitOnFinish { get; set; }
+
         public static CommandLineParameters Parse(string[] args)
         {
             var parsedParameters = new CommandLineParameters();
             parsedParameters.RunTests = args.Contains(GetFormattedParameter(RunTestsParameter));
+            parsedParameters.WaitOnFinish = args.Contains(GetFormattedParameter(WaitOnFinishParameter));
             parsedParameters.SolutionPath = GetParameterValue(args, SolutionPathParameter);
             parsedParameters.Revision = GetParameterValue(args, RevisionParameter);
             parsedParameters.WorkingFolder = GetParameterValue(args, WorkingFolderParameter);
