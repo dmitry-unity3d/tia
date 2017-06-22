@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using TestImpactAnalyzer.Lib;
+using TestImpactAnalyzer.Lib.Utils;
 
 namespace TestImpactAnalyzer.Console
 {
@@ -9,37 +10,44 @@ namespace TestImpactAnalyzer.Console
     {
         static void Main(string[] args)
         {
-            //var className = "Class1";
-            //var solutionPath = "C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.sln";
+            Trace.Listeners.Add(new ConsoleTraceListener());
 
-            //var workingFolder = "C:\\Projects\\unity3d\\unity";
-            var workingFolder = args[0];
-            var solutionPath = $"{workingFolder}\\Projects\\CSharp\\Unity.CSharpProjects.gen.sln";
+            CommandLineParameters commandLineParamters;
+            if (!CommandLineParameters.TryParse(args, out commandLineParamters))
+            {
+                return;
+            }
+            var workingFolder = commandLineParamters.WorkingFolder;
+            var solutionPath = commandLineParamters.SolutionPath;
+            var writeOutput = commandLineParamters.OutputFormatting == FormattingType.Text;
 
-            System.Console.WriteLine("Getting changed file(s)...");
+            Trace.WriteLineIf(writeOutput, "Getting changed file(s)...");
             var mercurialClient = new MercurialClient(workingFolder);
             var changes = mercurialClient.GetChangedFiles();
             foreach (var changedFile in changes)
             {
-                System.Console.WriteLine(changedFile);
+                Trace.WriteLineIf(writeOutput, changedFile);
             }
-            System.Console.WriteLine();
+            Trace.WriteLineIf(writeOutput, "");
 
             var classPath = changes[0];
             var className = Path.GetFileNameWithoutExtension(classPath);
 
-            System.Console.WriteLine("Searching for references in solution...");
+            Trace.WriteLineIf(writeOutput, "Searching for references in solution...");
             var finder = new ReferenceFinder(solutionPath);
-            //var locations = finder.FindClassUsages($"C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.Lib.Samples\\{className}.cs", $"{className}");
             var locations = finder.FindClassUsages(classPath, className);
-            System.Console.WriteLine("Affected file(s):");
+            Trace.WriteLineIf(writeOutput, "Affected file(s):");
             foreach (var location in locations)
             {
-                System.Console.WriteLine(location.Document.Name);
+                Trace.WriteLineIf(writeOutput, location.Document.Name);
             }
-            System.Console.WriteLine();
+            Trace.WriteLineIf(writeOutput, "");
 
-            System.Console.WriteLine("Affected unit test(s):");
+            if (!commandLineParamters.RunTests)
+            {
+                return;
+            }
+            Trace.WriteLineIf(writeOutput, "Affected unit test(s):");
             var unitTests = ReferenceFinder.GetUnitTestLocations(locations);
             var testsAssemlblies = new List<string>();
             var testsNames = new List<string>();
@@ -49,9 +57,9 @@ namespace TestImpactAnalyzer.Console
                 testsAssemlblies.Add(location.Document.Project.OutputFilePath);
                 testsNames.Add($"test =~ /{Path.GetFileNameWithoutExtension(location.Document.Name)}/");
             }
-            System.Console.WriteLine();
+            Trace.WriteLineIf(writeOutput, "");
 
-            System.Console.WriteLine("Running affected unit test(s)...");
+            Trace.WriteLineIf(writeOutput, "Running affected unit test(s)...");
             var testAssembliesCombined = string.Join(" ", testsAssemlblies);
             var testsExpression = string.Join(" || ", testsNames);
 
@@ -67,7 +75,7 @@ namespace TestImpactAnalyzer.Console
             runTestCommandProcess.Start();
             while (!runTestCommandProcess.StandardOutput.EndOfStream) {
                 var line = runTestCommandProcess.StandardOutput.ReadLine();
-                System.Console.WriteLine(line);
+                Trace.WriteLineIf(writeOutput, line);
             }
             System.Console.ReadLine();
         }
