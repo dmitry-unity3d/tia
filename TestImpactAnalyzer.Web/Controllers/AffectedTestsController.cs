@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Web.Http;
+using TestImpactAnalyzer.Web.Properties;
 
 namespace TestImpactAnalyzer.Web.Controllers
 {
@@ -30,8 +31,8 @@ namespace TestImpactAnalyzer.Web.Controllers
         {
             var runTestCommandProcess = new Process {
                 StartInfo = new ProcessStartInfo {
-                    FileName = "C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.Console\\bin\\Debug\\TestImpactAnalyzer.Console.exe",
-                    Arguments = $"--revision {revision} --working-folder C:\\Projects\\unity3d\\unity --solution-path C:\\Projects\\unity3d\\unity\\Projects\\CSharp\\Unity.CSharpProjects.gen.sln",
+                    FileName = Settings.Default.ImpactsAnalyzerToolPath,
+                    Arguments = $"--revision {revision} --working-folder {Settings.Default.WorkingFolder} --solution-path {Settings.Default.SolutionPath}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     CreateNoWindow = true

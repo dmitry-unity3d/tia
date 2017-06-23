@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TestImpactAnalyzer.Web.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ImpactsAnalyzerToolPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Projects\unity3d\tia\TestImpactAnalyzer.Console\bin\Debug\TestImpactAnalyzer.Console.exe</Value>
+    </Setting>
+    <Setting Name="WorkingFolder" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Projects\unity3d\unity</Value>
+    </Setting>
+    <Setting Name="SolutionPath" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">C:\Projects\unity3d\unity\Projects\CSharp\Unity.CSharpProjects.gen.sln</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
