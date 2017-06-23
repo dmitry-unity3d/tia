@@ -20,6 +20,10 @@ namespace TestImpactAnalyzer.Lib
 
         public string[] GetChangedFiles(string revision)
         {
+            if (string.IsNullOrEmpty(revision))
+            {
+                return GetChangedFiles();
+            }
             return ExecuteHgStatusCommand($"status --change {revision}");
         }
 

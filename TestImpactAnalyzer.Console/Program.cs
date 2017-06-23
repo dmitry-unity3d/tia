@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using TestImpactAnalyzer.Lib;
 using TestImpactAnalyzer.Lib.Utils;
 
@@ -25,7 +25,7 @@ namespace TestImpactAnalyzer.Console
 
             Trace.WriteLineIf(textOutput, "Getting changed file(s)...");
             var mercurialClient = new MercurialClient(workingFolder);
-            var changes = mercurialClient.GetChangedFiles();
+            var changes = mercurialClient.GetChangedFiles(commandLineParamters.Revision);
             foreach (var changedFile in changes)
             {
                 Trace.WriteLineIf(textOutput, changedFile);
@@ -45,14 +45,18 @@ namespace TestImpactAnalyzer.Console
             }
             Trace.WriteLineIf(textOutput, "");
 
+            Trace.WriteLineIf(textOutput, "Affected unit test(s):");
+            var unitTests = ReferenceFinder.GetUnitTestLocations(locations);
+            var unitTestFiles = new List<string>(unitTests.Select(ul => ul.Document.FilePath));
+            foreach (var unitTestFile in unitTestFiles)
+            {
+                Trace.WriteLineIf(!textOutput, unitTestFile);
+            }
+
             if (!commandLineParamters.RunTests)
             {
                 return;
             }
-            Trace.WriteLineIf(textOutput, "Affected unit test(s):");
-            var unitTests = ReferenceFinder.GetUnitTestLocations(locations);
-            var unitTestFiles = new List<string>(unitTests.Select(ul => ul.Document.FilePath));
-            Trace.WriteLineIf(!textOutput, JsonConvert.SerializeObject(unitTestFiles.ToArray()));
             var testsAssemlblies = new List<string>();
             var testsNames = new List<string>();
             foreach (var location in unitTests)
