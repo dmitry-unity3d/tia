@@ -5,13 +5,9 @@
 //------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
-using System.IO;
-using Microsoft.VisualStudio.ComponentModelHost;
 using Microsoft.VisualStudio.Shell;
-using TestImpactAnalyzer.Lib;
 
 namespace RunAffectedTestsCommand
 {
@@ -60,12 +56,14 @@ namespace RunAffectedTestsCommand
 
         private static void FindAndRunAffectedTests(object sender, EventArgs e)  
         {  
+            var testsImpactAnalyzerToolPath = "C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.Console\\bin\\Debug\\TestImpactAnalyzer.Console.exe";
             var workingFolder = "C:\\Projects\\unity3d\\unity";
+            var solutionPath = "C:\\Projects\\unity3d\\unity\\Projects\\CSharp\\Unity.CSharpProjects.gen.sln";
 
             var runTestCommandProcess = new Process {
                 StartInfo = new ProcessStartInfo {
-                    FileName = "C:\\Projects\\unity3d\\tia\\TestImpactAnalyzer.Console\\bin\\Debug\\TestImpactAnalyzer.Console.exe",
-                    Arguments = workingFolder,
+                    FileName = testsImpactAnalyzerToolPath,
+                    Arguments = $"--working-folder {workingFolder} --solution-path {solutionPath} --wait --run-tests --formatting text",
                     UseShellExecute = false
                 }
             };

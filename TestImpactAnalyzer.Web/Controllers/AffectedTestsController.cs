@@ -29,7 +29,7 @@ namespace TestImpactAnalyzer.Web.Controllers
 
         private static string[] GetAffectedTests(string revision)
         {
-            var runTestCommandProcess = new Process {
+            var getImpactedTestsCommand = new Process {
                 StartInfo = new ProcessStartInfo {
                     FileName = Settings.Default.ImpactsAnalyzerToolPath,
                     Arguments = $"--revision {revision} --working-folder {Settings.Default.WorkingFolder} --solution-path {Settings.Default.SolutionPath}",
@@ -38,10 +38,10 @@ namespace TestImpactAnalyzer.Web.Controllers
                     CreateNoWindow = true
                 }
             };
-            runTestCommandProcess.Start();
+            getImpactedTestsCommand.Start();
             var affectedTestsOutput = new List<string>();
-            while (!runTestCommandProcess.StandardOutput.EndOfStream) {
-                var line = runTestCommandProcess.StandardOutput.ReadLine();
+            while (!getImpactedTestsCommand.StandardOutput.EndOfStream) {
+                var line = getImpactedTestsCommand.StandardOutput.ReadLine();
                 affectedTestsOutput.Add(line);
             }
             return affectedTestsOutput.ToArray();
